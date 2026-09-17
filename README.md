@@ -1,11 +1,4 @@
-
 <div align="center">
-
-<a href="https://rakxmithub.github.io/">
-<img src="https://img.shields.io/badge/🌐_VISIT_MY_PORTFOLIO-7C3AED?style=for-the-badge&logo=googlechrome&logoColor=white"/>
-</a>
-
-<br><br>
 
 <img src="./assets/og-image.jpg" width="100%" alt="Mani Tayefi AI Engineer Portfolio"/>
 
