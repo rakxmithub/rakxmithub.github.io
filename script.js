@@ -5,7 +5,7 @@
 
 const CONFIG = {
   GITHUB_URL: "https://github.com/rakxmithub",
-  LINKEDIN_URL: "REPLACE_WITH_MY_LINKEDIN_URL", // ← your LinkedIn URL
+  LINKEDIN_URL: "https://www.linkedin.com/in/mani-tayefi-84b279437",
   EMAIL: "manitayefi123@gmail.com",
   WEB3FORMS_ACCESS_KEY: "ab7ba1a5-18d1-4bc1-9c34-cb67d1fb7bcb"
 };
@@ -19,6 +19,7 @@ function applyLinkedIn() {
   const url = CONFIG.LINKEDIN_URL;
   const placeholder = !url || url.includes("REPLACE_WITH");
   const ids = ["headerLinkedIn", "mobileLinkedIn", "contactLinkedIn", "footerLinkedIn", "heroLinkedIn"];
+  const displayUrl = url ? url.replace(/^https?:\/\/(www\.)?/, "") : "";
   ids.forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -29,12 +30,23 @@ function applyLinkedIn() {
       el.setAttribute("aria-hidden", "true");
     } else {
       el.href = url;
+      el.style.display = "";
+      el.removeAttribute("aria-hidden");
+      if (id === "contactLinkedIn") {
+        el.target = "_blank";
+        el.rel = "noopener noreferrer";
+      }
       const label = el.querySelector(".li-label");
-      if (label) label.textContent = url.replace(/^https?:\/\/(www\.)?/, "");
+      if (label) {
+        label.textContent = displayUrl;
+        // Prevent i18n from overwriting the real LinkedIn URL on language change
+        label.removeAttribute("data-i18n");
+      }
     }
   });
 }
 applyLinkedIn();
+window.addEventListener("mt:langchange", applyLinkedIn);
 
 /* Back to top */
 (function () {
@@ -1379,4 +1391,888 @@ sections.forEach((s) => activeObs.observe(s));
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   });
+})();
+
+
+/* ========== Pixel AI Cat (fully isolated) ========== */
+(function () {
+  "use strict";
+  try {
+    var root = document.getElementById("pixelCatRoot");
+    var canvas = document.getElementById("pixelCatCanvas");
+    var bubble = document.getElementById("pixelCatBubble");
+    if (!root || !canvas) return;
+
+    var reduced = false;
+    try {
+      reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (_) {}
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+
+    // Logical pixel size (16x16 sprite @ 4x = 64px)
+    var S = 16;
+    var SCALE = 4;
+    canvas.width = S * SCALE;
+    canvas.height = S * SCALE;
+
+    // Walk bounds relative to root (px)
+    var walkMin = 0;
+    var walkMax = 76; // keeps cat inside the small floor area
+    try {
+      if (window.matchMedia("(max-width: 600px)").matches) walkMax = 52;
+    } catch (_) {}
+
+    // Original site-matching palette
+    var C = {
+      body: "#c8c4bc",
+      bodyDark: "#9a958c",
+      bodyLight: "#ddd9d2",
+      outline: "#2a2a2e",
+      eye: "#1a1a1e",
+      eyeWhite: "#f2f2f0",
+      eyeShine: "#ffffff",
+      nose: "#e89a9a",
+      earInner: "#e8b0b0",
+      blush: "#e8a0a8",
+      accent: "#b4ff50",
+      lime: "#b4ff50",
+      tear: "#7ec8ff",
+      mouth: "#5a4a4a",
+      bow: "#e89a9a"
+    };
+
+    // State machine
+    var state = "IDLE";
+    var facing = 1; // 1 right, -1 left
+    var x = 20;
+    var y = 0;
+    var vx = 0;
+    var frame = 0;
+    var animT = 0;
+    var stateT = 0;
+    var stateDur = 3 + Math.random() * 4;
+    var blinkT = 0;
+    var blinkDur = 2.5 + Math.random() * 3;
+    var blinking = false;
+    var blinkPhase = 0;
+    var earPhase = 0;
+    var tailPhase = 0;
+    var breathPhase = 0;
+    var headTilt = 0;
+    var lookDir = 0; // -1 left, 0 center, 1 right
+    var talkMsg = "";
+    var talkT = 0;
+    var cryTears = 0;
+    var hoverLook = 0;
+    var clickReactT = 0;
+    var petT = 0;
+    var petting = false;
+    var hearts = [];
+    var lastTs = 0;
+    var running = true;
+    var catLang = "en";
+
+    // Messages match site languages — varied funny jokes
+    var MESSAGES_BY_LANG = {
+      en: [
+        "Meow.exe loaded 🐱",
+        "404: snacks not found",
+        "Compiling purrs...",
+        "I dream in tokens",
+        "Have you tried turning me off?",
+        "90% fluff, 10% bugs",
+        "git commit -m 'napped'",
+        "My bed is a cardboard box",
+        "Running on catnip GPU",
+        "I debug with my paws",
+        "Pull request: open tuna",
+        "NullPointerException: love",
+        "Stack overflow of cuddles",
+        "I speak fluent meow++",
+        "Out of memory: need snacks",
+        "I'm not lazy, I'm idle-optimized",
+        "Error 418: I'm a teapot cat",
+        "Ship it... after nap.",
+        "Cache miss: where's the laser?",
+        "sudo feed me",
+        "Keyboard is warm. Mine.",
+        "This meeting could've been a meow",
+        "I passed the Turing test (meow)",
+        "Quantum: asleep AND hungry",
+        "Binary: 0=no pet, 1=pet now",
+        "Day 47: humans still weird",
+        "If I fits, I sits.",
+        "Judging your code... and your life",
+        "Zoom call face = my resting face",
+        "I invented the slow blink protocol",
+        "Your playlist needs more meows",
+        "Plot twist: I ate the homework",
+        "Boss fight: empty food bowl",
+        "Achievement unlocked: knocked a cup",
+        "Loading personality... done. Chaotic.",
+        "I don't chase lasers. Lasers chase me.",
+        "Mood: mysterious loaf",
+        "Side quest: find the warmest laptop",
+        "NPC dialogue: meow. meow? MEOW!",
+        "Season finale: I woke up at 3am",
+        "Pro tip: never trust a quiet cat",
+        "I'm basically a furry debugger",
+        "Changelog: v1.0 — still cute",
+        "Warning: extreme softness ahead",
+        "Connection lost... napping",
+        "I rate this day 11/10 pets",
+        "Secret skill: ignoring you stylishly",
+        "Today's forecast: 100% chance of meow"
+      ],
+      de: [
+        "Miau.exe geladen 🐱",
+        "404: Snacks nicht gefunden",
+        "Schnurren wird kompiliert...",
+        "Ich träume in Tokens",
+        "Schon mal aus- und angeschaltet?",
+        "90% Fluff, 10% Bugs",
+        "git commit -m 'genickt'",
+        "Mein Bett ist ein Karton",
+        "Läuft auf Catnip-GPU",
+        "Ich debugge mit Pfoten",
+        "Pull Request: Thunfisch öffnen",
+        "NullPointerException: Liebe",
+        "Stack Overflow an Kuscheln",
+        "Ich spreche fließend Miau++",
+        "Out of Memory: brauche Snacks",
+        "Nicht faul, idle-optimiert",
+        "Fehler 418: Teekanne-Katze",
+        "Ship it... nach dem Nickerchen.",
+        "Cache miss: wo ist der Laser?",
+        "sudo fütter mich",
+        "Tastatur ist warm. Meins.",
+        "Meeting hätte ein Miau sein können",
+        "Turing-Test bestanden (miau)",
+        "Quanten: schlafend UND hungrig",
+        "Binär: 0=kein Streicheln, 1=jetzt",
+        "Tag 47: Menschen sind seltsam",
+        "If I fits, I sits.",
+        "Beurteile deinen Code... und dein Leben",
+        "Zoom-Gesicht = mein Normalgesicht",
+        "Ich erfand das Langsam-Blinzel-Protokoll",
+        "Deine Playlist braucht mehr Miaus",
+        "Plot twist: Ich aß die Hausaufgaben",
+        "Boss-Kampf: leerer Napf",
+        "Achievement: Tasse umgestoßen",
+        "Persönlichkeit laden... chaotisch.",
+        "Ich jage keine Laser. Laser jagen mich.",
+        "Stimmung: mysteriöser Laib",
+        "Nebenquest: wärmster Laptop",
+        "NPC-Dialog: miau. miau? MIAU!",
+        "Staffelende: 3 Uhr nachts wach",
+        "Profi-Tipp: stillen Katzen nicht trauen",
+        "Ich bin ein pelziger Debugger",
+        "Changelog: v1.0 — immer noch süß",
+        "Warnung: extreme Weichheit",
+        "Verbindung verloren... Nickerchen",
+        "Tag bewertet: 11/10 Streicheleinheiten",
+        "Geheimskill: stilvoll ignorieren",
+        "Wetter: 100% Chance auf Miau"
+      ],
+      ar: [
+        "تم تحميل مياو.exe 🐱",
+        "404: لم يُعثر على وجبات",
+        "جارٍ تجميع الخرخرة...",
+        "أحلم بالتوكنات",
+        "هل جربت إطفائي وتشغيلي؟",
+        "90٪ زغب، 10٪ أخطاء",
+        "git commit -m 'نمت'",
+        "سريري صندوق كرتون",
+        "أعمل على GPU النعناع",
+        "أصلح الأخطاء بمخالبي",
+        "طلب سحب: افتح التونة",
+        "NullPointerException: حب",
+        "فيضان عناق في المكدس",
+        "أتحدث مياو++ بطلاقة",
+        "نفدت الذاكرة: أحتاج وجبات",
+        "لست كسولاً، محسّن للخمول",
+        "خطأ 418: قطة إبريق شاي",
+        "انشره... بعد القيلولة.",
+        "خطأ كاش: أين الليزر؟",
+        "sudo أطعميني",
+        "لوحة المفاتيح دافئة. ملكي.",
+        "هذا الاجتماع كان يمكن أن يكون مياو",
+        "نجحت في اختبار تورينغ (مياو)",
+        "كمية: نائمة وجائعة معاً",
+        "ثنائي: 0=لا مداعبة، 1=الآن",
+        "اليوم 47: البشر غريبون",
+        "إذا ناسبني الحجم، أجلس.",
+        "أحكم على كودك... وحياتك",
+        "وجه الزوم = وجهي الطبيعي",
+        "اخترعت بروتوكول الرمش البطيء",
+        "قائمتك تحتاج مزيداً من المياو",
+        "مفاجأة: أكلت الواجب",
+        "معركة الزعيم: وعاء فارغ",
+        "إنجاز: أسقطت كوباً",
+        "تحميل الشخصية... فوضوية.",
+        "لا أطارد الليزر. الليزر يطاردني.",
+        "المزاج: رغيف غامض",
+        "مهمة جانبية: أدفأ لابتوب",
+        "حوار NPC: مياو. مياو؟ مياو!",
+        "نهاية الموسم: استيقظت الساعة 3",
+        "نصيحة: لا تثق بقطة هادئة",
+        "أنا مصحح أخطاء فروي",
+        "سجل التغييرات: v1.0 — ما زلت لطيفاً",
+        "تحذير: نعومة شديدة قادمة",
+        "انقطع الاتصال... قيلولة",
+        "تقييمي لليوم: 11/10 مداعبات",
+        "مهارة سرية: تجاهلك بأناقة",
+        "الطقس: 100٪ احتمال مياو"
+      ],
+      fr: [
+        "Miaou.exe chargé 🐱",
+        "404: snacks introuvables",
+        "Compilation des ronrons...",
+        "Je rêve en tokens",
+        "Tu as essayé de m'éteindre ?",
+        "90% fluff, 10% bugs",
+        "git commit -m 'sieste'",
+        "Mon lit est une boîte en carton",
+        "Tourne sur GPU cataire",
+        "Je débug avec mes pattes",
+        "Pull request: ouvrir le thon",
+        "NullPointerException: amour",
+        "Stack overflow de câlins",
+        "Je parle couramment miaou++",
+        "Out of memory: besoin de snacks",
+        "Pas paresseux, idle-optimisé",
+        "Erreur 418: chat-théière",
+        "Ship it... après la sieste.",
+        "Cache miss: où est le laser ?",
+        "sudo nourris-moi",
+        "Le clavier est chaud. À moi.",
+        "Cette réunion aurait pu être un miaou",
+        "Test de Turing réussi (miaou)",
+        "Quantique: endormi ET affamé",
+        "Binaire: 0=pas de câlin, 1=maintenant",
+        "Jour 47: les humains sont bizarres",
+        "If I fits, I sits.",
+        "Je juge ton code... et ta vie",
+        "Visage Zoom = mon visage normal",
+        "J'ai inventé le protocole clignement lent",
+        "Ta playlist a besoin de plus de miaous",
+        "Plot twist: j'ai mangé les devoirs",
+        "Boss fight: gamelle vide",
+        "Succès: gobelet renversé",
+        "Chargement personnalité... chaotique.",
+        "Je ne chasse pas les lasers. Ils me chassent.",
+        "Humeur: pain de chat mystérieux",
+        "Quête secondaire: laptop le plus chaud",
+        "Dialogue PNJ: miaou. miaou? MIAOU!",
+        "Finale: réveillé à 3h du mat",
+        "Conseil pro: ne jamais faire confiance à un chat silencieux",
+        "Je suis un debugger tout doux",
+        "Changelog: v1.0 — toujours mignon",
+        "Attention: douceur extrême",
+        "Connexion perdue... sieste",
+        "Note du jour: 11/10 câlins",
+        "Compétence secrète: t'ignorer avec style",
+        "Météo: 100% de chance de miaou"
+      ]
+    };
+
+    // Extra lines when being petted
+    var PET_MESSAGES_BY_LANG = {
+      en: [
+        "Purrrr... more please 💕",
+        "Right there— yes!",
+        "You found the sweet spot",
+        "Soft paws activated",
+        "Don't stop, human",
+        "Affection level: MAX",
+        "I accept payment in pets",
+        "This is better than tuna",
+        "Keep going, engineer",
+        "Heart.exe overflowing"
+      ],
+      de: [
+        "Schnurrrr... mehr bitte 💕",
+        "Genau da— ja!",
+        "Du hast die süße Stelle gefunden",
+        "Weiche Pfoten aktiviert",
+        "Nicht aufhören, Mensch",
+        "Zuneigung: MAX",
+        "Ich akzeptiere Streicheleinheiten",
+        "Besser als Thunfisch",
+        "Weiter so, Engineer",
+        "Heart.exe überläuft"
+      ],
+      ar: [
+        "خرخرة... المزيد من فضلك 💕",
+        "هنا— نعم!",
+        "وجدت النقطة الحلوة",
+        "تم تفعيل المخالب الناعمة",
+        "لا تتوقف أيها الإنسان",
+        "مستوى الحنان: أقصى",
+        "أقبل الدفع بالمداعبات",
+        "أفضل من التونة",
+        "استمر أيها المهندس",
+        "Heart.exe يمتلئ"
+      ],
+      fr: [
+        "Ronron... encore s'il te plaît 💕",
+        "Juste là— oui !",
+        "Tu as trouvé le bon endroit",
+        "Pattes douces activées",
+        "N'arrête pas, humain",
+        "Niveau d'affection: MAX",
+        "Je m'accepte en câlins",
+        "Mieux que le thon",
+        "Continue, ingénieur",
+        "Heart.exe déborde"
+      ]
+    };
+
+    function syncLang() {
+      try {
+        if (window.MT && typeof window.MT.getLang === "function") {
+          catLang = window.MT.getLang() || "en";
+        } else {
+          catLang = document.documentElement.lang || "en";
+        }
+      } catch (_) {
+        catLang = "en";
+      }
+      if (!MESSAGES_BY_LANG[catLang]) catLang = "en";
+    }
+
+    function getMessages() {
+      syncLang();
+      return MESSAGES_BY_LANG[catLang];
+    }
+
+    function getPetMessages() {
+      syncLang();
+      return PET_MESSAGES_BY_LANG[catLang] || PET_MESSAGES_BY_LANG.en;
+    }
+
+    try {
+      window.addEventListener("mt:langchange", function (e) {
+        try {
+          if (e && e.detail && e.detail.lang) catLang = e.detail.lang;
+        } catch (_) {}
+      });
+    } catch (_) {}
+
+    function setState(s, dur) {
+      state = s;
+      stateT = 0;
+      stateDur = dur != null ? dur : (2 + Math.random() * 3.5);
+      if (s === "WALK") {
+        facing = Math.random() < 0.5 ? -1 : 1;
+        vx = facing * (18 + Math.random() * 12);
+      } else {
+        vx = 0;
+      }
+      if (s === "TALK") {
+        var msgs = getMessages();
+        talkMsg = msgs[(Math.random() * msgs.length) | 0];
+        talkT = 0;
+        if (bubble) {
+          bubble.textContent = talkMsg;
+          bubble.hidden = false;
+          bubble.classList.add("is-visible");
+          // RTL for Arabic
+          try {
+            bubble.style.direction = (catLang === "ar") ? "rtl" : "ltr";
+          } catch (_) {}
+        }
+      } else if (bubble) {
+        bubble.classList.remove("is-visible");
+        setTimeout(function () {
+          try { if (state !== "TALK") bubble.hidden = true; } catch (_) {}
+        }, 200);
+      }
+      if (s === "CRY") cryTears = 0;
+    }
+
+    function pickNextState() {
+      if (reduced) {
+        setState("IDLE", 999);
+        return;
+      }
+      var r = Math.random();
+      if (r < 0.22) setState("IDLE", 2 + Math.random() * 3);
+      else if (r < 0.38) setState("WALK", 1.4 + Math.random() * 2);
+      else if (r < 0.48) setState("SIT", 1.8 + Math.random() * 2);
+      else if (r < 0.56) setState("LOOK", 1.2 + Math.random() * 1.5);
+      else if (r < 0.62) setState("SLEEP", 3 + Math.random() * 3.5);
+      else if (r < 0.88) setState("TALK", 2.6 + Math.random() * 1.6);
+      else if (r < 0.95) setState("HAPPY", 1.2 + Math.random());
+      else if (r < 0.98) setState("SAD", 1.5 + Math.random());
+      else setState("CRY", 2.2 + Math.random());
+    }
+
+    // Pixel helpers
+    function px(ix, iy, col) {
+      ctx.fillStyle = col;
+      ctx.fillRect(ix * SCALE, iy * SCALE, SCALE, SCALE);
+    }
+
+    function drawCat(opts) {
+      opts = opts || {};
+      var sit = !!opts.sit;
+      var sleep = !!opts.sleep;
+      var happy = !!opts.happy;
+      var sad = !!opts.sad;
+      var cry = !!opts.cry;
+      var talk = !!opts.talk;
+      var walkFrame = opts.walkFrame | 0;
+      var blink = !!opts.blink;
+      var earOff = opts.earOff || 0;
+      var tailOff = opts.tailOff || 0;
+      var breath = opts.breath || 0;
+      var head = opts.head || 0;
+      var look = opts.look || 0;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      if (facing < 0) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+
+      var by = 9 + (sit || sleep ? 1 : 0) - (breath | 0);
+
+      // Tail
+      var tc = tailOff;
+      if (sit || sleep) {
+        px(1, by + 1, C.outline);
+        px(1, by, C.body);
+        px(2, by - 1 + tc, C.body);
+        px(2, by - 2 + tc, C.outline);
+      } else {
+        px(1, by + 1, C.outline);
+        px(1, by, C.body);
+        px(0, by - 1 + tc, C.body);
+        px(0, by - 2 + tc, C.outline);
+      }
+
+      // Body + legs
+      if (sit || sleep) {
+        for (var i = 3; i <= 11; i++) px(i, by + 3, C.outline);
+        for (var i = 3; i <= 11; i++) px(i, by + 2, C.body);
+        for (var i = 4; i <= 10; i++) px(i, by + 1, C.body);
+        for (var i = 4; i <= 10; i++) px(i, by, C.body);
+        px(3, by + 1, C.outline);
+        px(11, by + 1, C.outline);
+        px(5, by + 4, C.body);
+        px(9, by + 4, C.body);
+      } else {
+        var leg = walkFrame % 2;
+        px(4, by + 4, C.outline);
+        px(4, by + 3, leg ? C.bodyDark : C.body);
+        px(10, by + 4, C.outline);
+        px(10, by + 3, leg ? C.body : C.bodyDark);
+        for (var i = 3; i <= 11; i++) px(i, by + 2, C.outline);
+        for (var i = 3; i <= 11; i++) px(i, by + 1, C.body);
+        for (var i = 4; i <= 10; i++) px(i, by, C.body);
+        px(3, by, C.outline);
+        px(11, by, C.outline);
+      }
+
+      // Chest
+      for (var i = 4; i <= 10; i++) px(i, by - 1, C.body);
+      px(4, by - 1, C.outline);
+      px(10, by - 1, C.outline);
+
+      // Head
+      var hy = by - 5 + head;
+      var eL = hy - 1 + (earOff > 0 ? 1 : 0) + ((sad || cry) ? 1 : 0);
+      var eR = hy - 1 + (earOff < 0 ? 1 : 0) + ((sad || cry) ? 1 : 0);
+
+      // Ears
+      px(5, eL - 1, C.outline);
+      px(5, eL, C.body);
+      px(6, eL - 1, C.body);
+      px(6, eL, C.earInner);
+      px(10, eR - 1, C.outline);
+      px(10, eR, C.body);
+      px(9, eR - 1, C.body);
+      px(9, eR, C.earInner);
+
+      // Head fill
+      for (var i = 5; i <= 10; i++) px(i, hy, C.body);
+      for (var i = 4; i <= 11; i++) px(i, hy + 1, C.body);
+      for (var i = 4; i <= 11; i++) px(i, hy + 2, C.body);
+      for (var i = 5; i <= 10; i++) px(i, hy + 3, C.body);
+      px(4, hy, C.outline); px(11, hy, C.outline);
+      px(4, hy + 1, C.outline); px(11, hy + 1, C.outline);
+      px(4, hy + 2, C.outline); px(11, hy + 2, C.outline);
+      px(5, hy + 3, C.outline); px(10, hy + 3, C.outline);
+      for (var i = 5; i <= 10; i++) px(i, hy - 1, C.outline);
+
+      // Eyes
+      var ey = hy + 1;
+      var lx = 6 + (look > 0 ? 1 : look < 0 ? -1 : 0);
+      var rx = 9 + (look > 0 ? 1 : look < 0 ? -1 : 0);
+      if (sleep || (blink && !happy)) {
+        px(lx, ey, C.outline);
+        px(rx, ey, C.outline);
+      } else if (happy) {
+        px(lx, ey, C.outline);
+        px(lx - 1, ey + 1, C.outline);
+        px(lx + 1, ey + 1, C.outline);
+        px(rx, ey, C.outline);
+        px(rx - 1, ey + 1, C.outline);
+        px(rx + 1, ey + 1, C.outline);
+      } else {
+        px(lx, ey, C.eyeWhite);
+        px(rx, ey, C.eyeWhite);
+        px(lx, ey, C.eye);
+        px(rx, ey, C.eye);
+      }
+
+      // Nose
+      px(7, hy + 2, C.nose);
+      px(8, hy + 2, C.nose);
+
+      // Mouth
+      if (talk) {
+        px(7, hy + 3, C.mouth);
+        px(8, hy + 3, C.mouth);
+      } else if (sad || cry) {
+        px(6, hy + 3, C.mouth);
+        px(7, hy + 3, C.mouth);
+        px(9, hy + 3, C.mouth);
+      } else if (happy) {
+        px(6, hy + 3, C.mouth);
+        px(7, hy + 3, C.mouth);
+        px(8, hy + 3, C.mouth);
+        px(9, hy + 3, C.mouth);
+      } else {
+        px(7, hy + 3, C.outline);
+        px(8, hy + 3, C.outline);
+      }
+
+      // Tears
+      if (cry && cryTears > 0.3) {
+        px(6, hy + 2, C.tear);
+        if (cryTears > 0.7) px(6, hy + 3, C.tear);
+        px(9, hy + 2, C.tear);
+        if (cryTears > 0.7) px(9, hy + 3, C.tear);
+      }
+
+      // Sleep Z
+      if (sleep) {
+        var z = ((animT * 1.5) | 0) % 3;
+        px(12, hy - 1 - z, C.lime);
+        if (z > 0) px(13, hy - 2 - z, C.lime);
+      }
+
+      // Floating hearts while petting / happy
+      for (var hi = 0; hi < hearts.length; hi++) {
+        var h = hearts[hi];
+        var hx = Math.round(h.x);
+        var hy2 = Math.round(h.y);
+        if (h.life > 0.15) {
+          px(hx, hy2, C.nose);
+          px(hx - 1, hy2 - 1, C.nose);
+          px(hx + 1, hy2 - 1, C.nose);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function update(dt) {
+      animT += dt;
+      stateT += dt;
+      breathPhase += dt * 1.6;
+      earPhase += dt * 2.2;
+      tailPhase += dt * 2.8;
+      blinkT += dt;
+
+      if (clickReactT > 0) {
+        clickReactT -= dt;
+      }
+      if (petting) {
+        petT += dt;
+        if (petT > 0.25 && ((petT * 8) | 0) !== (((petT - dt) * 8) | 0)) {
+          spawnHeart();
+        }
+      }
+      // hearts physics
+      for (var hi = hearts.length - 1; hi >= 0; hi--) {
+        var h = hearts[hi];
+        h.life -= dt;
+        h.y += h.vy * dt;
+        h.x += Math.sin(animT * 6 + hi) * 4 * dt;
+        if (h.life <= 0) hearts.splice(hi, 1);
+      }
+
+      // Blink
+      if (!reduced && state !== "SLEEP") {
+        if (!blinking && blinkT >= blinkDur) {
+          blinking = true;
+          blinkPhase = 0;
+        }
+        if (blinking) {
+          blinkPhase += dt;
+          if (blinkPhase > 0.18) {
+            blinking = false;
+            blinkT = 0;
+            blinkDur = 2.2 + Math.random() * 4;
+          }
+        }
+      }
+
+      // Hover look toward cursor (subtle)
+      if (hoverLook !== 0 && state !== "SLEEP" && state !== "WALK") {
+        lookDir = hoverLook;
+      } else if (state === "LOOK") {
+        lookDir = Math.sin(animT * 1.4) > 0 ? 1 : -1;
+      } else {
+        lookDir = 0;
+      }
+
+      // Movement
+      if (state === "WALK" && !reduced) {
+        x += vx * dt;
+        if (x <= walkMin) {
+          x = walkMin;
+          facing = 1;
+          vx = Math.abs(vx);
+        } else if (x >= walkMax) {
+          x = walkMax;
+          facing = -1;
+          vx = -Math.abs(vx);
+        }
+      }
+
+      if (state === "TALK") {
+        talkT += dt;
+        if (talkT > stateDur) {
+          if (bubble) {
+            bubble.classList.remove("is-visible");
+            setTimeout(function () { try { bubble.hidden = true; } catch (_) {} }, 180);
+          }
+        }
+      }
+      if (state === "CRY") {
+        cryTears = Math.min(1, stateT / 0.8);
+      }
+
+      if (stateT >= stateDur) {
+        pickNextState();
+      }
+
+      // Position canvas
+      canvas.style.left = Math.round(x) + "px";
+      if (bubble) {
+        bubble.style.left = Math.round(x + 8) + "px";
+      }
+    }
+
+    function render() {
+      var breath = Math.sin(breathPhase) > 0.55 ? 1 : 0;
+      var earOff = 0;
+      if (state === "IDLE" || state === "LOOK") {
+        earOff = Math.sin(earPhase) > 0.7 ? 1 : Math.sin(earPhase) < -0.7 ? -1 : 0;
+      }
+      if (clickReactT > 0) earOff = 1;
+      var tailOff = Math.sin(tailPhase) > 0 ? 1 : 0;
+      var head = 0;
+      if (state === "LOOK") head = Math.sin(animT * 1.1) > 0.5 ? -1 : 0;
+      if (state === "SAD" || state === "CRY") head = 1;
+
+      var walkFrame = 0;
+      if (state === "WALK") walkFrame = ((animT * 6) | 0) % 2;
+
+      drawCat({
+        sit: state === "SIT" || state === "SLEEP",
+        sleep: state === "SLEEP",
+        happy: state === "HAPPY" || clickReactT > 0.6,
+        sad: state === "SAD",
+        cry: state === "CRY",
+        talk: state === "TALK" && ((animT * 8) | 0) % 2 === 0,
+        walkFrame: walkFrame,
+        blink: blinking,
+        earOff: earOff,
+        tailOff: tailOff,
+        breath: state === "SLEEP" ? 0 : breath,
+        head: head,
+        look: lookDir
+      });
+    }
+
+    function loop(ts) {
+      if (!running) return;
+      if (!lastTs) lastTs = ts;
+      var dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      try {
+        update(dt);
+        render();
+      } catch (_) {}
+      requestAnimationFrame(loop);
+    }
+
+    // Interactions — pet, click, talk
+    var clickCount = 0;
+    var lastClickTs = 0;
+
+    function forceTalk(usePet) {
+      var msgs = usePet ? getPetMessages() : getMessages();
+      talkMsg = msgs[(Math.random() * msgs.length) | 0];
+      state = "TALK";
+      stateT = 0;
+      stateDur = usePet ? 2.0 : 2.6;
+      talkT = 0;
+      if (bubble) {
+        bubble.textContent = talkMsg;
+        bubble.hidden = false;
+        bubble.classList.add("is-visible");
+        try {
+          bubble.style.direction = (catLang === "ar") ? "rtl" : "ltr";
+        } catch (_) {}
+      }
+    }
+
+    function spawnHeart() {
+      hearts.push({
+        x: 6 + Math.random() * 6,
+        y: 4 + Math.random() * 3,
+        life: 0.8 + Math.random() * 0.5,
+        max: 1.2,
+        vy: -8 - Math.random() * 6
+      });
+      if (hearts.length > 8) hearts.shift();
+    }
+
+    // Hold / drag on cat = petting
+    canvas.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        petting = true;
+        petT = 0;
+        clickReactT = 1.5;
+        setState("HAPPY", 2);
+        spawnHeart();
+      } catch (_) {}
+    });
+    window.addEventListener("mouseup", function () {
+      try {
+        if (petting) {
+          petting = false;
+          if (petT > 0.35) forceTalk(true);
+        }
+      } catch (_) {}
+    });
+    canvas.addEventListener("mousemove", function (e) {
+      try {
+        if (petting) {
+          clickReactT = 1.2;
+          if (Math.random() < 0.15) spawnHeart();
+          if (state !== "HAPPY" && state !== "TALK") setState("HAPPY", 1.5);
+        }
+      } catch (_) {}
+    });
+    canvas.addEventListener("touchstart", function (e) {
+      e.stopPropagation();
+      try {
+        petting = true;
+        petT = 0;
+        clickReactT = 1.5;
+        setState("HAPPY", 2);
+        spawnHeart();
+      } catch (_) {}
+    }, { passive: true });
+    canvas.addEventListener("touchend", function () {
+      try {
+        if (petting) {
+          petting = false;
+          if (petT > 0.35) forceTalk(true);
+        }
+      } catch (_) {}
+    });
+
+    canvas.addEventListener("click", function (e) {
+      e.stopPropagation();
+      try {
+        var now = Date.now();
+        if (now - lastClickTs < 400) clickCount++;
+        else clickCount = 1;
+        lastClickTs = now;
+        clickReactT = 1.4;
+        spawnHeart();
+
+        if (clickCount >= 3) {
+          clickCount = 0;
+          forceTalk(false);
+          clickReactT = 2;
+        } else if (clickCount === 2) {
+          forceTalk(false);
+        } else {
+          setState("HAPPY", 0.9);
+          setTimeout(function () {
+            try {
+              if (state === "HAPPY" || state === "IDLE") forceTalk(false);
+            } catch (_) {}
+          }, 450);
+        }
+      } catch (_) {}
+    });
+
+    canvas.addEventListener("mouseenter", function () {
+      try {
+        hoverLook = facing;
+        if (!reduced && state === "IDLE" && Math.random() < 0.3) {
+          forceTalk(false);
+        }
+      } catch (_) {}
+    });
+    canvas.addEventListener("mouseleave", function () {
+      try {
+        hoverLook = 0;
+        if (petting) {
+          petting = false;
+          if (petT > 0.35) forceTalk(true);
+        }
+      } catch (_) {}
+    });
+
+    // Track cursor for subtle eye look when near
+    window.addEventListener("mousemove", function (e) {
+      try {
+        if (reduced) return;
+        var r = canvas.getBoundingClientRect();
+        var cx = r.left + r.width / 2;
+        var cy = r.top + r.height / 2;
+        var dx = e.clientX - cx;
+        var dy = e.clientY - cy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          hoverLook = dx > 8 ? 1 : dx < -8 ? -1 : 0;
+        } else if (dist > 160) {
+          hoverLook = 0;
+        }
+      } catch (_) {}
+    }, { passive: true });
+
+    // Init
+    if (reduced) {
+      setState("IDLE", 9999);
+    } else {
+      setState("IDLE", 2 + Math.random() * 2);
+    }
+    render();
+    requestAnimationFrame(loop);
+
+    // Safety: never let errors kill the page
+  } catch (err) {
+    try {
+      var r = document.getElementById("pixelCatRoot");
+      if (r) r.style.display = "none";
+    } catch (_) {}
+  }
 })();

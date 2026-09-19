@@ -1,45 +1,70 @@
 <div align="center">
 
-<img src="./assets/og-image.jpg" width="100%" alt="Mani Tayefi AI Engineer Portfolio"/>
-
-<br><br>
-
-<img src="./assets/mani-tayefi.jpg" width="150" height="150" style="border-radius:50%;" alt="Mani Tayefi"/>
-
 # MANI TAYEFI
+### AI ENGINEER
+**PYTHON / LLMs / RAG**
+`SYSTEM ONLINE_`
 
-### AI ENGINEER · RAG · LLMs · INTELLIGENT SYSTEMS
-
-<p>
-Building AI systems that connect <b>data, retrieval, intelligence and applications.</b>
-</p>
-
+</div>
 <br>
 
-<h2>🌐 MY PORTFOLIO</h2>
+<div align="center">
 
-<a href="https://rakxmithub.github.io/">
-<img src="https://img.shields.io/badge/🚀_EXPLORE_MY_PORTFOLIO-7C3AED?style=for-the-badge&logo=googlechrome&logoColor=white"/>
-</a>
+&gt; INITIALIZING AI CORE...
+&gt; LOADING NEURAL SYSTEM...
+&gt; RAG MODULE ONLINE
+&gt; READY TO BUILD_
 
+</div>
 <br>
 
-<a href="https://rakxmithub.github.io/">
-<strong>rakxmithub.github.io</strong>
-</a>
+<div align="center">
 
-<br><br>
+[
 
-<a href="https://github.com/rakxmithub">
-<img src="https://img.shields.io/badge/GITHUB-111111?style=for-the-badge&logo=github&logoColor=white"/>
-</a>
-&nbsp;
-<a href="mailto:manitayefi123@gmail.com">
-<img src="https://img.shields.io/badge/CONTACT-2563EB?style=for-the-badge&logo=gmail&logoColor=white"/>
-</a>
+![GITHUB](https://img.shields.io/badge/GITHUB-0D1117?style=for-the-badge)
 
-<br><br>
+](https://github.com/rakxmithub)
+[
 
-<img src="https://komarev.com/ghpvc/?username=rakxmithub&style=for-the-badge&color=7C3AED&label=PROFILE+VIEWS"/>
+![PORTFOLIO](https://img.shields.io/badge/PORTFOLIO-0D1117?style=for-the-badge)
+
+](https://rakxmithub.github.io/)
+
+</div>
+<br>
+
+---
+
+<div align="center">
+
+**Python | PyTorch | Git | GitHub | VS Code | HTML | CSS**
+
+`LLMs` `RAG` `LangChain` `Machine Learning` `AI Automation`
+
+</div>
+<br>
+
+<div align="center">
+
+`[ PYTHON ] → [ ML ] → [ LLMs ] → [ RAG ] → [ AI ]`
+
+</div>
+<br>
+
+---
+
+<div align="center">
+
+"// FEATURED PROJECT"
+
+**[iran-live-currency-dashboard](https://github.com/rakxmithub/iran-live-currency-dashboard)**
+
+</div>
+<br>
+
+<div align="center">
+
+`>> BUILD`  `>> LEARN`  `>> EXPERIMENT`  `>> EVOLVE_`
 
 </div>

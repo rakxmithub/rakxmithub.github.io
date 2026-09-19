@@ -1163,3 +1163,99 @@ html[dir="rtl"] .lang-menu { right: auto; left: 0; }
     margin-top: 16px;
   }
 }
+
+/* ========== Pixel AI Cat (isolated) ========== */
+.pixel-cat-root {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 140px;
+  height: 80px;
+  z-index: 50;
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.pixel-cat-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+  pointer-events: none;
+}
+.pixel-cat-canvas {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+.pixel-cat-bubble {
+  position: absolute;
+  bottom: 58px;
+  left: 0;
+  max-width: 140px;
+  padding: 5px 9px;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text, #e8e8ec);
+  background: rgba(12, 14, 18, 0.94);
+  border: 1px solid rgba(180, 255, 80, 0.4);
+  border-radius: 6px 6px 6px 2px;
+  box-shadow: 0 0 10px rgba(180, 255, 80, 0.15), 0 2px 6px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(5px) scale(0.94);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
+  z-index: 2;
+  text-align: center;
+}
+.pixel-cat-bubble.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.pixel-cat-bubble::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  background: rgba(12, 14, 18, 0.94);
+  border-right: 1px solid rgba(180, 255, 80, 0.4);
+  border-bottom: 1px solid rgba(180, 255, 80, 0.4);
+  transform: rotate(45deg);
+}
+@media (max-width: 600px) {
+  .pixel-cat-root {
+    left: 8px;
+    bottom: 10px;
+    width: 100px;
+    height: 64px;
+  }
+  .pixel-cat-canvas {
+    width: 48px;
+    height: 48px;
+  }
+  .pixel-cat-bubble {
+    font-size: 9px;
+    max-width: 90px;
+    bottom: 46px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pixel-cat-bubble {
+    transition: none;
+  }
+}
